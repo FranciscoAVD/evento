@@ -32,8 +32,6 @@ export function generateMetadata({ params }:Props): Metadata{
   })
 }
 
-
-
 export default function EventsPage({ params, searchParams }: EventsPageProps) {
   const city = params.city;
   const cityName = uppercase(params.city);
