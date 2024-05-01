@@ -5,13 +5,13 @@ import PaginationControls from "./pagination-controls";
 import { MAX_EVENTS_PER_PAGE } from "@/lib/constants";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Half2Icon } from "@radix-ui/react-icons";
+
 
 type EventsListProps = {
   name: string;
 };
 
-export default function sectionEventsList({ name }: EventsListProps) {
+export default function SectionEventsList({ name }: EventsListProps) {
   const city = useQuery(api.cities.getCity, { name: name });
   const { results, status, loadMore } = usePaginatedQuery(
     api.events.getEvents,
