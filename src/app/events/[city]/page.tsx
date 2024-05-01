@@ -32,18 +32,16 @@ export function generateMetadata({ params }:Props): Metadata{
   })
 }
 
-export default function EventsPage({ params, searchParams }: EventsPageProps) {
+export default function EventsPage({ params }: EventsPageProps) {
   const city = params.city;
   const cityName = uppercase(params.city);
-  const page = searchParams.page || 1;
 
   return (
     <main className="flex flex-col items-center py-24 px-[20px] min-h-[110vh]">
       <H1 className="mb-28">{city === "all" ? "All Events" : `Events in ${cityName}`}</H1>
-      <Suspense key={city + page} fallback={<Loading />}>
-        <EventsList city={city} page={+page}/>
+      <Suspense key={city} fallback={<Loading />}>
+        <EventsList name={cityName}/>
       </Suspense>
-      
     </main>
   );
 }

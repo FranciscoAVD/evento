@@ -1,14 +1,14 @@
 "use client";
 
-//type from prisma to replace type in lib
-import { EventoEvent } from "@prisma/client";
+import { TEventoEvent } from "@/lib/types";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
+import { imageUrl } from "@/lib/constants";
 
 type EventCardProps = {
-  event: EventoEvent;
+  event: TEventoEvent;
 };
 
 const MotionLink = motion(Link);
@@ -39,7 +39,7 @@ export default function EventCard({ event }: EventCardProps) {
      scale-effect"
       >
         <Image
-          src={event.imageUrl}
+          src={imageUrl}
           alt={event.name}
           width={500}
           height={280}
@@ -47,7 +47,7 @@ export default function EventCard({ event }: EventCardProps) {
         />
         <div className="flex flex-col items-center justify-center flex-1">
           <h2 className="text-2xl font-semibold">{event.name}</h2>
-          <p className="italic text-white/75">By {event.organizerName}</p>
+          <p className="italic text-white/75">By {event.organizer_name}</p>
           <p className="text-sm text-white/50 mt-4">{event.location}</p>
         </div>
         <section className="flex flex-col items-center justify-center absolute left-[12px] top-[12px] h-[45px] w-[45px] bg-black/30 rounded-md">

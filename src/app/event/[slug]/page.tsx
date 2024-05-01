@@ -1,16 +1,12 @@
-import H1 from "@/components/h1";
-import { getEvent } from "@/lib/utils";
-import { Metadata } from "next";
-import Image from "next/image";
+"use client";
 
-export async function generateMetadata({ params }:Props): Promise<Metadata>{
-  const slug = params.slug;
- 
-  const event = await getEvent(slug);
-  return {
-    title: `Evento - ${event.name}`
-  }
-}
+import H1 from "@/components/h1";
+import { imageUrl } from "@/lib/constants";
+import Image from "next/image";
+import { useQuery } from "convex/react";
+import { api } from "../../../../convex/_generated/api";
+import { TEventoEvent } from "@/lib/types";
+import Skeleton from "@/components/skeleton";
 
 type Props = {
   params: {
@@ -18,15 +14,15 @@ type Props = {
   };
 };
 
-export default async function EventPage({ params }: Props) {
-  const slug = params.slug;
-  const event = await getEvent(slug);
+export default function EventPage({ params }: Props) {
+  const event = useQuery(api.events.getEvent, { slug: params.slug });
+
   return (
     <main>
       <section className="relative overflow-hidden flex items-center justify-center py-14 md:py-20">
         <Image
           className="object-cover blur-3xl -z-10"
-          src={event.imageUrl}
+          src={imageUrl}
           alt="Event Image"
           fill
           quality={50}
@@ -35,42 +31,32 @@ export default async function EventPage({ params }: Props) {
 
         <div className="flex flex-col items-center text-center gap-x-6 gap-y-6 md:flex-row md:text-left lg:gap-x-16">
           <Image
-            src={event.imageUrl}
-            alt={event.name}
+            src={imageUrl}
+            alt={event ? event.name : "image"}
             width={300}
             height={201}
           />
-          <div className="flex flex-col md:h-[200px]">
-            <p className="text-white/75">
-              {new Date(event.date).toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-              })}
-            </p>
-
-            <H1 className="mb-2 mt-1 whitespace-nowrap lg:text-5xl">
-              {event.name}
-            </H1>
-            <p className="whitespace-nowrap text-white/75 md:text-base">
-              Organized by <span className="italic">{event.organizerName}</span>
-            </p>
-            <button className="bg-white/20 py-2 text-lg capitalize rounded-md border-white/10 border-2 mt-5 md:mt-auto w-[95dvw] sm:w-full md:text-base scale-effect">
-              Get tickets
-            </button>
-          </div>
+          {event ? <SectionTop event={event} /> : <LoadingSection />}
         </div>
       </section>
       <div className="min-h-[75dvh] text-center px-5 py-16">
         <Section>
           <SectionHeading>About this event</SectionHeading>
-          <p className="text-lg leading-8 text-white/75 max-w-4xl mx-auto">
-            {event.description}
-          </p>
+          {event ? (
+            <p className="text-lg leading-8 text-white/75 max-w-4xl mx-auto">
+              {event.description}
+            </p>
+          ) : (
+            <LoadingSection />
+          )}
         </Section>
         <Section>
           <SectionHeading>Location</SectionHeading>
-          <SectionContent>{event.location}</SectionContent>
+          {event ? (
+            <SectionContent>{event.location}</SectionContent>
+          ) : (
+            <Skeleton className="h-6 w-[250px] mx-auto" />
+          )}
         </Section>
       </div>
     </main>
@@ -90,5 +76,37 @@ function SectionContent({ children }: { children: React.ReactNode }) {
     <p className="text-lg leading-8 text-white/75 max-w-4xl mx-auto">
       {children}
     </p>
+  );
+}
+
+function SectionTop({ event }: { event: TEventoEvent }) {
+  return (
+    <div className="flex flex-col md:h-[200px]">
+      <p className="text-white/75">
+        {new Date(event.date).toLocaleDateString("en-US", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+        })}
+      </p>
+
+      <H1 className="mb-2 mt-1 whitespace-nowrap lg:text-5xl">{event.name}</H1>
+      <p className="whitespace-nowrap text-white/75 md:text-base">
+        Organized by <span className="italic">{event.organizer_name}</span>
+      </p>
+      <button className="bg-white/20 py-2 text-lg capitalize rounded-md border-white/10 border-2 mt-5 md:mt-auto w-[95dvw] sm:w-full md:text-base scale-effect">
+        Get tickets
+      </button>
+    </div>
+  );
+}
+
+function LoadingSection() {
+  return (
+    <div className="w-full mx-auto flex flex-col justify-center items-center gap-y-2">
+      <Skeleton className="h-4 w-[200px]" />
+      <Skeleton className="h-10 w-[280px]" />
+      <Skeleton className="h-6 w-[250px]" />
+    </div>
   );
 }
